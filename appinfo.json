@@ -1,0 +1,57 @@
+{
+  "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "shortName": "Monogram",
+  "longName": "Monogram Watchface",
+  "companyName": "Sterling Ely",
+  "versionLabel": "1.0",
+  "versionCode": 1,
+  "sdkVersion": "3",
+  "projectType": "native",
+  "enableMultiJS": true,
+  "targetPlatforms": [
+    "aplite",
+    "basalt",
+    "chalk",
+    "diorite",
+    "emery",
+    "flint"
+  ],
+  "watchapp": {
+    "watchface": true
+  },
+  "capabilities": [
+    "configurable",
+    "health"
+  ],
+  "appKeys": {
+    "TimeTextColor":   0,
+    "DateTextColor":   1,
+    "LitBatteryColor": 2,
+    "LitStepsColor":   3,
+    "DimBatteryColor": 4,
+    "DimStepsColor":   5,
+    "BackgroundColor": 6,
+    "OverlayBgColor":  7,
+    "StepGoal":        8,
+    "InvertBW":        9,
+    "ShowRing":        10
+  },
+  "resources": {
+    "media": [
+      {
+        "menuIcon": true,
+        "type": "png",
+        "name": "IMAGE_MENU_ICON",
+        "file": "images/menu_icon~bw.png",
+        "targetPlatforms": ["aplite", "diorite", "flint"]
+      },
+      {
+        "menuIcon": true,
+        "type": "png",
+        "name": "IMAGE_MENU_ICON",
+        "file": "images/menu_icon~color.png",
+        "targetPlatforms": ["basalt", "chalk", "emery"]
+      }
+    ]
+  }
+}
