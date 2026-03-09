@@ -2,46 +2,49 @@ module.exports = {
   buildUrl: function(platform, currentSettings) {
 
     // -------------------------------------------------------------------------
-    // PRESETS
-    // 8 color slots per preset:
-    //   bg, obg                    — background, overlay bg
-    //   timeText, dateText         — text colors
-    //   litB, litS                 — lit ring: battery, steps
-    //   dimB, dimS                 — unlit ring: battery, steps
+    // PRESET SCHEMA
+    // All 12 color slots defined per preset:
+    //   bg, obg                    — base (background, overlay bg)
+    //   timeText, dateText         — text
+    //   litH, litM, litB, litS     — lit (hours, minutes, battery, steps)
+    //   dimH, dimM, dimB, dimS     — unlit (hours, minutes, battery, steps)
+    // Presets use cohesive monochromatic or analogous palettes — no wacky
+    // rainbows, since the tick ring is a background element here.
     // -------------------------------------------------------------------------
-    function p(label, bg, obg, tt, dt, lB, lS, dB, dS) {
+    function p(label, bg, obg, tt, dt, lH, lM, lB, lS, dH, dM, dB, dS) {
       return { label:label, bg:bg, obg:obg, timeText:tt, dateText:dt,
-               litB:lB, litS:lS, dimB:dB, dimS:dS };
+               litH:lH, litM:lM, litB:lB, litS:lS,
+               dimH:dH, dimM:dM, dimB:dB, dimS:dS };
     }
 
     var presets = [
-      // ---- DARK ----
-      p('Ember',      '#000000','#000000','#ffffff','#aaaaaa', '#ff5500','#ff5500','#555555','#555555'),
-      p('Cobalt',     '#000000','#000000','#ffffff','#aaaaaa', '#0055ff','#0055ff','#555555','#555555'),
-      p('Jade',       '#000000','#000000','#ffffff','#aaaaaa', '#00aa55','#00aa55','#555555','#555555'),
-      p('Slate',      '#000000','#000000','#ffffff','#aaaaaa', '#aaaaaa','#aaaaaa','#555555','#555555'),
-      p('Crimson',    '#000000','#000000','#ffffff','#aa5555', '#ff5555','#ff5555','#550000','#550000'),
-      p('Ocean',      '#000000','#000000','#ffffff','#0055aa', '#00aaff','#00aaff','#0055aa','#0055aa'),
-      p('Volt',       '#000000','#000000','#ffffff','#aaaa55', '#ffff00','#ffff00','#555500','#555500'),
-      p('Dusk',       '#000000','#000000','#ffffff','#aa00aa', '#ff55ff','#ff55ff','#550055','#550055'),
-      // ---- LIGHT ----
-      p('Paper',      '#ffffff','#ffffff','#000000','#555555', '#000000','#000000','#aaaaaa','#aaaaaa'),
-      p('Mint',       '#ffffff','#ffffff','#000000','#005500', '#005500','#005500','#aaffaa','#aaffaa'),
-      p('Rose',       '#ffffff','#ffffff','#550000','#550000', '#550000','#550000','#ffaaaa','#ffaaaa'),
-      p('Sky',        '#ffffff','#ffffff','#000000','#0000aa', '#0000aa','#0000aa','#aaaaff','#aaaaff'),
-      p('Sapphire',   '#ffffff','#ffffff','#000000','#555555', '#0055aa','#0055aa','#aaaaaa','#aaaaaa'),
-      p('Ruby',       '#ffffff','#ffffff','#000000','#555555', '#aa0000','#aa0000','#aaaaaa','#aaaaaa'),
-      p('Sepia',      '#ffffaa','#ffffaa','#000000','#aa5500', '#550000','#550000','#ffaa55','#ffaa55'),
-      p('Ash',        '#555555','#555555','#ffffff','#ffffff', '#ffffff','#ffffff','#aaaaaa','#aaaaaa'),
-      // ---- COLOR ----
-      p('Teal',       '#00aaaa','#00aaaa','#ffffff','#ffffff', '#ffffff','#ffffff','#005555','#005555'),
-      p('Flame',      '#ff5500','#ff5500','#ffffff','#ffffff', '#ffffff','#ffffff','#aa5500','#aa5500'),
-      p('Plum',       '#550055','#550055','#ffffff','#ff55ff', '#ff55ff','#ff55ff','#aa00aa','#aa00aa'),
-      p('Forest',     '#005500','#005500','#ffffff','#55ff00', '#55ff00','#55ff00','#55aa00','#55aa00'),
-      p('Midnight',   '#0000aa','#0000aa','#aaaaff','#aaaaff', '#00ffff','#aaaaff','#0055aa','#0055aa'),
-      p('Cinnabar',   '#550000','#550000','#ffffff','#ffaa55', '#ffaa55','#ff5500','#aa0000','#aa0000'),
-      p('Horizon',    '#000000','#0000aa','#ffaa55','#aaaaaa', '#0055ff','#ff5500','#0000aa','#550000'),
-      p('Solar',      '#000000','#000000','#ffffff','#ffaa00', '#ffaa00','#aaff00','#555500','#005500'),
+      // ---- DARK (8): monochromatic / analogous on black ----
+      p('Ember',     '#000000','#000000','#ffffff','#aaaaaa', '#ff5500','#ff5500','#ff5500','#ff5500', '#555555','#555555','#555555','#555555'),
+      p('Cobalt',    '#000000','#000000','#ffffff','#aaaaaa', '#0055ff','#0055ff','#0055ff','#0055ff', '#555555','#555555','#555555','#555555'),
+      p('Jade',      '#000000','#000000','#ffffff','#aaaaaa', '#00aa55','#00aa55','#00aa55','#00aa55', '#555555','#555555','#555555','#555555'),
+      p('Slate',     '#000000','#000000','#ffffff','#aaaaaa', '#ffffff','#aaaaaa','#aaaaaa','#aaaaaa', '#555555','#555555','#555555','#555555'),
+      p('Crimson',   '#000000','#000000','#ffffff','#aa5555', '#ff5555','#ff5555','#ff5555','#ff5555', '#550000','#550000','#550000','#550000'),
+      p('Ocean',     '#000000','#000000','#ffffff','#0055aa', '#00aaff','#00aaff','#00aaff','#00aaff', '#0055aa','#0055aa','#0055aa','#0055aa'),
+      p('Volt',      '#000000','#000000','#ffffff','#aaaa55', '#ffff00','#ffff00','#ffff00','#ffff00', '#555500','#555500','#555500','#555500'),
+      p('Dusk',      '#000000','#000000','#ffffff','#aa00aa', '#ff55ff','#ff55ff','#ff55ff','#ff55ff', '#550055','#550055','#550055','#550055'),
+      // ---- LIGHT (8): white/light backgrounds ----
+      p('Paper',     '#ffffff','#ffffff','#000000','#555555', '#000000','#000000','#000000','#000000', '#aaaaaa','#aaaaaa','#aaaaaa','#aaaaaa'),
+      p('Mint',      '#ffffff','#ffffff','#000000','#005500', '#005500','#005500','#005500','#005500', '#aaffaa','#aaffaa','#aaffaa','#aaffaa'),
+      p('Rose',      '#ffffff','#ffffff','#550000','#550000', '#550000','#550000','#550000','#550000', '#ffaaaa','#ffaaaa','#ffaaaa','#ffaaaa'),
+      p('Sky',       '#ffffff','#ffffff','#000000','#0000aa', '#0000aa','#0000aa','#0000aa','#0000aa', '#aaaaff','#aaaaff','#aaaaff','#aaaaff'),
+      p('Sapphire',  '#ffffff','#ffffff','#000000','#555555', '#0055aa','#0055aa','#0055aa','#0055aa', '#aaaaaa','#aaaaaa','#aaaaaa','#aaaaaa'),
+      p('Ruby',      '#ffffff','#ffffff','#000000','#555555', '#aa0000','#aa0000','#aa0000','#aa0000', '#aaaaaa','#aaaaaa','#aaaaaa','#aaaaaa'),
+      p('Sepia',     '#ffffaa','#ffffaa','#000000','#aa5500', '#550000','#550000','#550000','#550000', '#ffaa55','#ffaa55','#ffaa55','#ffaa55'),
+      p('Ash',       '#555555','#555555','#ffffff','#ffffff', '#ffffff','#ffffff','#ffffff','#ffffff', '#aaaaaa','#aaaaaa','#aaaaaa','#aaaaaa'),
+      // ---- COLOR (8): saturated backgrounds ----
+      p('Teal',      '#00aaaa','#00aaaa','#ffffff','#ffffff', '#ffffff','#ffffff','#ffffff','#ffffff', '#005555','#005555','#005555','#005555'),
+      p('Flame',     '#ff5500','#ff5500','#ffffff','#ffffff', '#ffffff','#ffffff','#ffffff','#ffffff', '#aa5500','#aa5500','#aa5500','#aa5500'),
+      p('Plum',      '#550055','#550055','#ffffff','#ff55ff', '#ff55ff','#ff55ff','#ff55ff','#ff55ff', '#aa00aa','#aa00aa','#aa00aa','#aa00aa'),
+      p('Forest',    '#005500','#005500','#ffffff','#55ff00', '#55ff00','#55ff00','#55ff00','#55ff00', '#55aa00','#55aa00','#55aa00','#55aa00'),
+      p('Midnight',  '#0000aa','#0000aa','#aaaaff','#aaaaff', '#00ffff','#aaaaff','#00aaff','#aaaaff', '#0055aa','#0055aa','#0055aa','#0055aa'),
+      p('Cinnabar',  '#550000','#550000','#ffffff','#ffaa55', '#ffaa55','#ff5500','#ffaa00','#ff5500', '#aa0000','#aa0000','#aa5500','#aa0000'),
+      p('Horizon',   '#000000','#0000aa','#ffaa55','#aaaaaa', '#0055ff','#ff5500','#0055aa','#aa5500', '#0000aa','#550000','#0000aa','#550000'),
+      p('Solar',     '#000000','#000000','#ffffff','#ffaa00', '#ff5500','#ffaa00','#ffaa00','#aaff00', '#550000','#555500','#555500','#005500'),
     ];
 
     // -------------------------------------------------------------------------
@@ -89,8 +92,11 @@ module.exports = {
     var presetsHtml = presetRows.map(function(row) {
       var rowItems = row.presets.map(function(p) {
         var i = presets.indexOf(p);
-        return '<div class="preset" onclick="applyPreset(' + i + ')" style="background:' + p.bg + ';border:2px solid ' + p.litB + '">'
-          + '<div class="preset-pip" style="background:' + p.litB + '"></div>'
+        var pipBg = (p.litH === p.litM)
+          ? p.litH
+          : 'linear-gradient(90deg,' + p.litH + ' 50%,' + p.litM + ' 50%)';
+        return '<div class="preset" onclick="applyPreset(' + i + ')" style="background:' + p.bg + ';border:2px solid ' + p.litM + '">'
+          + '<div class="preset-pip" style="background:' + pipBg + '"></div>'
           + '<div class="preset-label" style="color:' + p.timeText + '">' + p.label + '</div>'
           + '</div>';
       }).join('');
@@ -116,6 +122,7 @@ module.exports = {
       + '.row label{font-size:15px;color:#ddd;flex:1}'
       + '.row .right{display:flex;align-items:center;gap:8px}'
       + '.swatch{width:36px;height:28px;border-radius:5px;cursor:pointer;border:2px solid #333;flex-shrink:0}'
+      // Level 1 expand
       + '.expand-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #222;cursor:pointer;user-select:none}'
       + '.expand-row:last-child{border-bottom:none}'
       + '.expand-row label{font-size:15px;color:#ddd;flex:1;cursor:pointer}'
@@ -127,17 +134,31 @@ module.exports = {
       + '.sub-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px 9px 28px;border-bottom:1px solid #1e1e1e}'
       + '.sub-row:last-child{border-bottom:none}'
       + '.sub-row label{font-size:14px;color:#aaa;flex:1}'
+      // Level 2 expand
+      + '.sub-expand-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px 9px 28px;border-bottom:1px solid #1e1e1e;cursor:pointer;user-select:none}'
+      + '.sub-expand-row label{font-size:14px;color:#aaa;flex:1;cursor:pointer}'
+      + '.sub-expand-row .right{display:flex;align-items:center;gap:8px}'
+      + '.sub-expand-btn{font-size:15px;color:#444;line-height:1;width:20px;text-align:center;transition:transform .15s}'
+      + '.sub-expand-btn.open{transform:rotate(45deg);color:#ffffff}'
+      + '.sub-sub-rows{display:none;background:#0e0e0e}'
+      + '.sub-sub-rows.open{display:block}'
+      + '.sub-sub-row{display:flex;align-items:center;justify-content:space-between;padding:8px 14px 8px 42px;border-bottom:1px solid #181818}'
+      + '.sub-sub-row:last-child{border-bottom:none}'
+      + '.sub-sub-row label{font-size:13px;color:#888;flex:1}'
+      // Toggle
       + '.toggle{position:relative;width:44px;height:26px;flex-shrink:0}'
       + '.toggle input{opacity:0;width:0;height:0}'
       + '.knob{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#333;border-radius:13px;transition:.2s}'
       + '.knob:before{content:"";position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:#666;border-radius:50%;transition:.2s}'
       + 'input:checked+.knob{background:#ffffff}'
       + 'input:checked+.knob:before{transform:translateX(18px);background:#000}'
+      // Slider
       + '.slider-wrap{padding:10px 14px}'
       + '.slider-lbl{font-size:15px;color:#ddd;display:flex;justify-content:space-between;margin-bottom:8px}'
       + '.slider-lbl span{color:#ffffff;font-weight:bold}'
       + 'input[type=range]{width:100%;accent-color:#ffffff}'
       + '.note{font-size:12px;color:#444;padding:4px 14px 10px;display:block}'
+      // Presets
       + '.presets{padding:4px 14px 10px}'
       + '.preset-row-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#888;padding:8px 0 4px}'
       + '.preset-row{display:flex;gap:6px;margin-bottom:4px}'
@@ -145,6 +166,7 @@ module.exports = {
       + '.preset:active{opacity:0.7}'
       + '.preset-pip{width:20px;height:3px;border-radius:2px}'
       + '.preset-label{font-size:10px}'
+      // Modal
       + '.modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center}'
       + '.modal-bg.open{display:flex}'
       + '.modal{background:#1a1a1a;border-radius:12px;padding:16px;width:90%;max-width:340px}'
@@ -153,6 +175,7 @@ module.exports = {
       + '.pal-swatch{width:100%;aspect-ratio:1;border-radius:3px;cursor:pointer;border:2px solid transparent}'
       + '.pal-swatch:hover,.pal-swatch.selected{border-color:#fff}'
       + '.modal-cancel{margin-top:12px;width:100%;padding:10px;background:#333;color:#aaa;border:none;border-radius:7px;font-size:14px;cursor:pointer}'
+      // Save
       + 'button.save{display:block;width:100%;padding:14px;background:#ffffff;color:#000;border:none;border-radius:8px;font-size:17px;font-weight:bold;cursor:pointer;margin-top:24px}'
       + 'button.save:active{opacity:0.8}'
       + '</style></head><body>'
@@ -162,11 +185,11 @@ module.exports = {
       // PRESETS
       + '<h2>Presets</h2><div class="card"><div class="presets">' + presetsHtml + '</div></div>'
 
-      // COLORS
+      // COLOR SECTION
       + '<div id="color-section">'
       + '<h2>Colors</h2><div class="card">'
 
-      // Text
+      // TEXT
       + '<div class="expand-row" onclick="toggle(\'text\')">'
       + '<label>Text</label>'
       + '<div class="right"><div class="swatch" id="sw-TextAll" onclick="openPicker(\'TextAll\');event.stopPropagation()"></div><span class="expand-btn" id="btn-text">+</span></div>'
@@ -176,27 +199,55 @@ module.exports = {
       + '<div class="sub-row"><label>Date &amp; Day</label><div class="swatch" id="sw-DateTextColor" onclick="openPicker(\'DateTextColor\')"></div></div>'
       + '</div>'
 
-      // Ring (lit)
-      + '<div class="expand-row" onclick="toggle(\'litring\')">'
-      + '<label>Ring</label>'
-      + '<div class="right"><div class="swatch" id="sw-LitRing" onclick="openPicker(\'LitRing\');event.stopPropagation()"></div><span class="expand-btn" id="btn-litring">+</span></div>'
+      // LIT: Time Ticks → Hours/Minutes; Outer Ring → Battery/Steps
+      + '<div class="expand-row" onclick="toggle(\'lit\')">'
+      + '<label>Lit</label>'
+      + '<div class="right"><div class="swatch" id="sw-LitAll" onclick="openPicker(\'LitAll\');event.stopPropagation()"></div><span class="expand-btn" id="btn-lit">+</span></div>'
       + '</div>'
-      + '<div class="sub-rows" id="sub-litring">'
-      + '<div class="sub-row"><label>Battery</label><div class="swatch" id="sw-LitBatteryColor" onclick="openPicker(\'LitBatteryColor\')"></div></div>'
-      + '<div class="sub-row"><label>Steps</label><div class="swatch" id="sw-LitStepsColor" onclick="openPicker(\'LitStepsColor\')"></div></div>'
+      + '<div class="sub-rows" id="sub-lit">'
+      + '<div class="sub-expand-row" onclick="toggle2(\'litticks\')">'
+      + '<label>Time Ticks</label>'
+      + '<div class="right"><div class="swatch" id="sw-LitTicks" onclick="openPicker(\'LitTicks\');event.stopPropagation()"></div><span class="sub-expand-btn" id="btn2-litticks">+</span></div>'
+      + '</div>'
+      + '<div class="sub-sub-rows" id="sub2-litticks">'
+      + '<div class="sub-sub-row"><label>Hours</label><div class="swatch" id="sw-LitHourColor" onclick="openPicker(\'LitHourColor\')"></div></div>'
+      + '<div class="sub-sub-row"><label>Minutes</label><div class="swatch" id="sw-LitMinuteColor" onclick="openPicker(\'LitMinuteColor\')"></div></div>'
+      + '</div>'
+      + '<div class="sub-expand-row" onclick="toggle2(\'litring\')">'
+      + '<label>Outer Ring</label>'
+      + '<div class="right"><div class="swatch" id="sw-LitRing" onclick="openPicker(\'LitRing\');event.stopPropagation()"></div><span class="sub-expand-btn" id="btn2-litring">+</span></div>'
+      + '</div>'
+      + '<div class="sub-sub-rows" id="sub2-litring">'
+      + '<div class="sub-sub-row"><label>Battery</label><div class="swatch" id="sw-LitBatteryColor" onclick="openPicker(\'LitBatteryColor\')"></div></div>'
+      + '<div class="sub-sub-row"><label>Steps</label><div class="swatch" id="sw-LitStepsColor" onclick="openPicker(\'LitStepsColor\')"></div></div>'
+      + '</div>'
       + '</div>'
 
-      // Ring (unlit)
-      + '<div class="expand-row" onclick="toggle(\'dimring\')">'
-      + '<label>Ring (unlit)</label>'
-      + '<div class="right"><div class="swatch" id="sw-DimRing" onclick="openPicker(\'DimRing\');event.stopPropagation()"></div><span class="expand-btn" id="btn-dimring">+</span></div>'
+      // UNLIT
+      + '<div class="expand-row" onclick="toggle(\'dim\')">'
+      + '<label>Unlit</label>'
+      + '<div class="right"><div class="swatch" id="sw-DimAll" onclick="openPicker(\'DimAll\');event.stopPropagation()"></div><span class="expand-btn" id="btn-dim">+</span></div>'
       + '</div>'
-      + '<div class="sub-rows" id="sub-dimring">'
-      + '<div class="sub-row"><label>Battery</label><div class="swatch" id="sw-DimBatteryColor" onclick="openPicker(\'DimBatteryColor\')"></div></div>'
-      + '<div class="sub-row"><label>Steps</label><div class="swatch" id="sw-DimStepsColor" onclick="openPicker(\'DimStepsColor\')"></div></div>'
+      + '<div class="sub-rows" id="sub-dim">'
+      + '<div class="sub-expand-row" onclick="toggle2(\'dimticks\')">'
+      + '<label>Time Ticks</label>'
+      + '<div class="right"><div class="swatch" id="sw-DimTicks" onclick="openPicker(\'DimTicks\');event.stopPropagation()"></div><span class="sub-expand-btn" id="btn2-dimticks">+</span></div>'
+      + '</div>'
+      + '<div class="sub-sub-rows" id="sub2-dimticks">'
+      + '<div class="sub-sub-row"><label>Hours</label><div class="swatch" id="sw-DimHourColor" onclick="openPicker(\'DimHourColor\')"></div></div>'
+      + '<div class="sub-sub-row"><label>Minutes</label><div class="swatch" id="sw-DimMinuteColor" onclick="openPicker(\'DimMinuteColor\')"></div></div>'
+      + '</div>'
+      + '<div class="sub-expand-row" onclick="toggle2(\'dimring\')">'
+      + '<label>Outer Ring</label>'
+      + '<div class="right"><div class="swatch" id="sw-DimRing" onclick="openPicker(\'DimRing\');event.stopPropagation()"></div><span class="sub-expand-btn" id="btn2-dimring">+</span></div>'
+      + '</div>'
+      + '<div class="sub-sub-rows" id="sub2-dimring">'
+      + '<div class="sub-sub-row"><label>Battery</label><div class="swatch" id="sw-DimBatteryColor" onclick="openPicker(\'DimBatteryColor\')"></div></div>'
+      + '<div class="sub-sub-row"><label>Steps</label><div class="swatch" id="sw-DimStepsColor" onclick="openPicker(\'DimStepsColor\')"></div></div>'
+      + '</div>'
       + '</div>'
 
-      // Base
+      // BASE
       + '<div class="expand-row" onclick="toggle(\'base\')">'
       + '<label>Base</label>'
       + '<div class="right"><div class="swatch" id="sw-BaseAll" onclick="openPicker(\'BaseAll\');event.stopPropagation()"></div><span class="expand-btn" id="btn-base">+</span></div>'
@@ -215,13 +266,13 @@ module.exports = {
       + '<label class="toggle"><input type="checkbox" id="InvertBW"><span class="knob"></span></label></div>'
       + '</div></div>'
 
-      // Ring toggle
+      // RING TOGGLE
       + '<h2>Outer Ring</h2><div class="card">'
       + '<div class="row"><label>Show battery &amp; steps ring</label>'
       + '<label class="toggle"><input type="checkbox" id="ShowRing" checked><span class="knob"></span></label></div>'
       + '</div>'
 
-      // Health
+      // HEALTH
       + '<h2>Health</h2><div class="card">'
       + '<div class="slider-wrap">'
       + '<div class="slider-lbl">Daily Step Goal <span id="goalVal">10,000</span></div>'
@@ -241,19 +292,28 @@ module.exports = {
       + '<script>'
       + platformData + presetsData + paletteData
 
+      // Color store — all 12 slots
       + 'var colors={'
       + 'BackgroundColor:"#000000",'
       + 'OverlayBgColor:"#000000",'
       + 'TimeTextColor:"#ffffff",'
       + 'DateTextColor:"#aaaaaa",'
+      + 'LitHourColor:"#ffffff",'
+      + 'LitMinuteColor:"#aaaaaa",'
       + 'LitBatteryColor:"#ffffff",'
       + 'LitStepsColor:"#ffffff",'
+      + 'DimHourColor:"#555555",'
+      + 'DimMinuteColor:"#555555",'
       + 'DimBatteryColor:"#555555",'
       + 'DimStepsColor:"#555555"'
       + '};'
 
       + 'var cascadeMap={'
+      + '"LitAll":["LitHourColor","LitMinuteColor","LitBatteryColor","LitStepsColor"],'
+      + '"LitTicks":["LitHourColor","LitMinuteColor"],'
       + '"LitRing":["LitBatteryColor","LitStepsColor"],'
+      + '"DimAll":["DimHourColor","DimMinuteColor","DimBatteryColor","DimStepsColor"],'
+      + '"DimTicks":["DimHourColor","DimMinuteColor"],'
       + '"DimRing":["DimBatteryColor","DimStepsColor"],'
       + '"TextAll":["TimeTextColor","DateTextColor"],'
       + '"BaseAll":["BackgroundColor","OverlayBgColor"]'
@@ -263,10 +323,15 @@ module.exports = {
       + 'colors[key]=hex;'
       + 'var el=document.getElementById("sw-"+key);if(el)el.style.background=hex;'
       + 'function setSplit(id,a,b){var e=document.getElementById(id);if(e)e.style.background="linear-gradient(135deg,"+a+" 50%,"+b+" 50%)"}'
+      + 'function setQuad(id,a,b,c,d){var e=document.getElementById(id);if(e)e.style.background="conic-gradient("+a+" 0 25%,"+b+" 0 50%,"+c+" 0 75%,"+d+" 0 100%)"}'
+      + 'setSplit("sw-LitTicks", colors.LitHourColor,    colors.LitMinuteColor);'
       + 'setSplit("sw-LitRing",  colors.LitBatteryColor, colors.LitStepsColor);'
+      + 'setQuad("sw-LitAll",   colors.LitHourColor, colors.LitMinuteColor, colors.LitBatteryColor, colors.LitStepsColor);'
+      + 'setSplit("sw-DimTicks", colors.DimHourColor,    colors.DimMinuteColor);'
       + 'setSplit("sw-DimRing",  colors.DimBatteryColor, colors.DimStepsColor);'
-      + 'setSplit("sw-TextAll",  colors.TimeTextColor,   colors.DateTextColor);'
-      + 'setSplit("sw-BaseAll",  colors.BackgroundColor, colors.OverlayBgColor);'
+      + 'setQuad("sw-DimAll",   colors.DimHourColor, colors.DimMinuteColor, colors.DimBatteryColor, colors.DimStepsColor);'
+      + 'setSplit("sw-TextAll", colors.TimeTextColor,   colors.DateTextColor);'
+      + 'setSplit("sw-BaseAll", colors.BackgroundColor, colors.OverlayBgColor);'
       + '}'
 
       + 'var pickerTarget=null;var pickerKeys=null;'
@@ -274,7 +339,7 @@ module.exports = {
       + 'function openPicker(key){'
       + 'pickerTarget=key;'
       + 'pickerKeys=cascadeMap[key]||[key];'
-      + 'var labels={"LitRing":"Ring","DimRing":"Ring (unlit)","TextAll":"Text","BaseAll":"Base"};'
+      + 'var labels={"LitAll":"Lit","LitTicks":"Time Ticks","LitRing":"Outer Ring","DimAll":"Unlit","DimTicks":"Time Ticks","DimRing":"Outer Ring","TextAll":"Text","BaseAll":"Base"};'
       + 'var label=labels[key]||key.replace(/([A-Z])/g," $1").trim();'
       + 'document.getElementById("modal-title").textContent=label;'
       + 'var grid=document.getElementById("palette-grid");'
@@ -323,14 +388,24 @@ module.exports = {
       + 'var open=sub.classList.toggle("open");'
       + 'btn.classList.toggle("open",open);}'
 
+      + 'function toggle2(id){'
+      + 'var sub=document.getElementById("sub2-"+id);'
+      + 'var btn=document.getElementById("btn2-"+id);'
+      + 'var open=sub.classList.toggle("open");'
+      + 'btn.classList.toggle("open",open);}'
+
       + 'function applyPreset(i){'
       + 'var p=PRESETS[i];'
       + 'updateSwatches("BackgroundColor",p.bg);'
       + 'updateSwatches("OverlayBgColor",p.obg);'
       + 'updateSwatches("TimeTextColor",p.timeText);'
       + 'updateSwatches("DateTextColor",p.dateText);'
+      + 'updateSwatches("LitHourColor",p.litH);'
+      + 'updateSwatches("LitMinuteColor",p.litM);'
       + 'updateSwatches("LitBatteryColor",p.litB);'
       + 'updateSwatches("LitStepsColor",p.litS);'
+      + 'updateSwatches("DimHourColor",p.dimH);'
+      + 'updateSwatches("DimMinuteColor",p.dimM);'
       + 'updateSwatches("DimBatteryColor",p.dimB);'
       + 'updateSwatches("DimStepsColor",p.dimS);}'
 
@@ -339,14 +414,18 @@ module.exports = {
 
       + 'function save(){'
       + 'var s={'
-      + 'BackgroundColor:h(colors.BackgroundColor),'
-      + 'OverlayBgColor:h(colors.OverlayBgColor),'
       + 'TimeTextColor:h(colors.TimeTextColor),'
       + 'DateTextColor:h(colors.DateTextColor),'
+      + 'LitHourColor:h(colors.LitHourColor),'
+      + 'LitMinuteColor:h(colors.LitMinuteColor),'
       + 'LitBatteryColor:h(colors.LitBatteryColor),'
       + 'LitStepsColor:h(colors.LitStepsColor),'
+      + 'DimHourColor:h(colors.DimHourColor),'
+      + 'DimMinuteColor:h(colors.DimMinuteColor),'
       + 'DimBatteryColor:h(colors.DimBatteryColor),'
       + 'DimStepsColor:h(colors.DimStepsColor),'
+      + 'BackgroundColor:h(colors.BackgroundColor),'
+      + 'OverlayBgColor:h(colors.OverlayBgColor),'
       + 'InvertBW:tog("InvertBW"),'
       + 'ShowRing:tog("ShowRing"),'
       + 'StepGoal:parseInt(document.getElementById("StepGoal").value)'

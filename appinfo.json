@@ -24,17 +24,21 @@
     "health"
   ],
   "appKeys": {
-    "TimeTextColor":   0,
-    "DateTextColor":   1,
-    "LitBatteryColor": 2,
-    "LitStepsColor":   3,
-    "DimBatteryColor": 4,
-    "DimStepsColor":   5,
-    "BackgroundColor": 6,
-    "OverlayBgColor":  7,
-    "StepGoal":        8,
-    "InvertBW":        9,
-    "ShowRing":        10
+    "TimeTextColor":    0,
+    "DateTextColor":    1,
+    "LitHourColor":     2,
+    "LitMinuteColor":   3,
+    "LitBatteryColor":  4,
+    "LitStepsColor":    5,
+    "DimHourColor":     6,
+    "DimMinuteColor":   7,
+    "DimBatteryColor":  8,
+    "DimStepsColor":    9,
+    "BackgroundColor":  10,
+    "OverlayBgColor":   11,
+    "StepGoal":         12,
+    "InvertBW":         13,
+    "ShowRing":         14
   },
   "resources": {
     "media": [
