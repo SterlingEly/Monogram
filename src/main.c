@@ -1,31 +1,42 @@
 #include <pebble.h>
 
 // ============================================================
-// MONOGRAM — skeleton scaffold
-// Based on Radium 2. No shake/art mode. Overlay always visible.
+// MONOGRAM
+// Based on Radium 2. Overlay always visible (no shake/art mode).
+// Full radial tick ring in background (hours + minutes arcs).
 // Round: digits fill overlay circle, no day/date on face.
 // Rect:  digits in overlay circle, day/date above/below circle.
-// Digit assets (10 digits x 4 positions) not yet implemented —
-// placeholder text renders in the overlay until assets are ready.
+//
+// TODO: replace placeholder LECO text with monogram digit bitmaps
+// once assets are designed (10 digits × 4 positions).
 // ============================================================
 
 #define SETTINGS_KEY      1
 #define DEFAULT_STEP_GOAL 10000
-#define RING_GAP          2
-#define RING_THICK        6
+#define RING_GAP          2    // px gap between outer ring and tick radials
+#define RING_THICK        6    // outer ring thickness in px
 
 // ============================================================
 // SETTINGS
 // ============================================================
 typedef struct {
+  // Text (2)
   GColor TimeTextColor;
   GColor DateTextColor;
+  // Lit elements (4)
+  GColor LitHourColor;
+  GColor LitMinuteColor;
   GColor LitBatteryColor;
   GColor LitStepsColor;
+  // Unlit elements (4)
+  GColor DimHourColor;
+  GColor DimMinuteColor;
   GColor DimBatteryColor;
   GColor DimStepsColor;
+  // Base (2)
   GColor BackgroundColor;
   GColor OverlayBgColor;
+  // Non-color
   int    StepGoal;
   bool   InvertBW;
   bool   ShowRing;
@@ -39,15 +50,23 @@ static void prv_default_settings(void) {
 #if defined(PBL_COLOR)
   s_settings.TimeTextColor   = GColorWhite;
   s_settings.DateTextColor   = GColorWhite;
-  s_settings.LitBatteryColor = GColorMintGreen;
-  s_settings.LitStepsColor   = GColorMintGreen;
+  s_settings.LitHourColor    = GColorWhite;
+  s_settings.LitMinuteColor  = GColorLightGray;
+  s_settings.LitBatteryColor = GColorWhite;
+  s_settings.LitStepsColor   = GColorWhite;
+  s_settings.DimHourColor    = GColorDarkGray;
+  s_settings.DimMinuteColor  = GColorDarkGray;
   s_settings.DimBatteryColor = GColorDarkGray;
   s_settings.DimStepsColor   = GColorDarkGray;
 #else
   s_settings.TimeTextColor   = GColorWhite;
   s_settings.DateTextColor   = GColorWhite;
+  s_settings.LitHourColor    = GColorWhite;
+  s_settings.LitMinuteColor  = GColorWhite;
   s_settings.LitBatteryColor = GColorWhite;
   s_settings.LitStepsColor   = GColorWhite;
+  s_settings.DimHourColor    = GColorDarkGray;
+  s_settings.DimMinuteColor  = GColorDarkGray;
   s_settings.DimBatteryColor = GColorDarkGray;
   s_settings.DimStepsColor   = GColorDarkGray;
 #endif
@@ -80,6 +99,10 @@ static char s_time_buffer[8];
 static char s_day_buffer[12];
 static char s_date_buffer[10];
 
+static GPoint    s_tri_pts[3];
+static GPathInfo s_tri_info = { .num_points = 3, .points = s_tri_pts };
+static GPath    *s_tri_path = NULL;
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -96,6 +119,16 @@ static const char *get_month_abbr(int mon) {
     "JUL","AUG","SEP","OCT","NOV","DEC"
   };
   return (mon >= 0 && mon < 12) ? months[mon] : "";
+}
+
+static void draw_wedge(GContext *ctx, int cx, int cy, int radius,
+                       int32_t a1, int32_t a2) {
+  s_tri_pts[0] = GPoint(cx, cy);
+  s_tri_pts[1] = GPoint(cx + radius * sin_lookup(a1) / TRIG_MAX_RATIO,
+                        cy - radius * cos_lookup(a1) / TRIG_MAX_RATIO);
+  s_tri_pts[2] = GPoint(cx + radius * sin_lookup(a2) / TRIG_MAX_RATIO,
+                        cy - radius * cos_lookup(a2) / TRIG_MAX_RATIO);
+  gpath_draw_filled(ctx, s_tri_path);
 }
 
 // ============================================================
@@ -116,36 +149,276 @@ static void draw_layer(Layer *layer, GContext *ctx) {
 
   // ----------------------------------------------------------
   // EFFECTIVE COLORS
+  // B&W: InvertBW swaps black/white.
   // ----------------------------------------------------------
 #if defined(PBL_BW)
-  GColor bw_lit   = s_settings.InvertBW ? GColorBlack     : GColorWhite;
-  GColor bw_dim   = s_settings.InvertBW ? GColorLightGray : GColorDarkGray;
-  GColor col_bg   = s_settings.InvertBW ? GColorWhite     : GColorBlack;
-  GColor col_fg   = s_settings.InvertBW ? GColorBlack     : GColorWhite;
-  GColor col_dfg  = col_fg;
-  GColor col_batt = bw_lit;
-  GColor col_step = bw_lit;
+  GColor bw_lit    = s_settings.InvertBW ? GColorBlack     : GColorWhite;
+  GColor bw_dim    = s_settings.InvertBW ? GColorLightGray : GColorDarkGray;
+  GColor col_bg    = s_settings.InvertBW ? GColorWhite     : GColorBlack;
+  GColor col_fg    = s_settings.InvertBW ? GColorBlack     : GColorWhite;
+  GColor col_dfg   = col_fg;
+  GColor col_hour  = bw_lit;
+  GColor col_min   = bw_lit;
+  GColor col_batt  = bw_lit;
+  GColor col_step  = bw_lit;
+  GColor col_dhour = bw_dim;
+  GColor col_dmin  = bw_dim;
   GColor col_dbatt = bw_dim;
   GColor col_dstep = bw_dim;
-  GColor col_obg  = col_bg;
+  GColor col_obg   = col_bg;
 #else
-  GColor col_bg   = s_settings.BackgroundColor;
-  GColor col_fg   = s_settings.TimeTextColor;
-  GColor col_dfg  = s_settings.DateTextColor;
-  GColor col_batt = s_settings.LitBatteryColor;
-  GColor col_step = s_settings.LitStepsColor;
+  GColor col_bg    = s_settings.BackgroundColor;
+  GColor col_fg    = s_settings.TimeTextColor;
+  GColor col_dfg   = s_settings.DateTextColor;
+  GColor col_hour  = s_settings.LitHourColor;
+  GColor col_min   = s_settings.LitMinuteColor;
+  GColor col_batt  = s_settings.LitBatteryColor;
+  GColor col_step  = s_settings.LitStepsColor;
+  GColor col_dhour = s_settings.DimHourColor;
+  GColor col_dmin  = s_settings.DimMinuteColor;
   GColor col_dbatt = s_settings.DimBatteryColor;
   GColor col_dstep = s_settings.DimStepsColor;
-  GColor col_obg  = s_settings.OverlayBgColor;
+  GColor col_obg   = s_settings.OverlayBgColor;
 #endif
 
   bool show_ring = s_settings.ShowRing;
+  int inset = show_ring ? (RING_THICK + RING_GAP) : 0;
+  GRect tick_rect = GRect(inset, inset, w - 2*inset, h - 2*inset);
+  int inner_short = (tick_rect.size.w < tick_rect.size.h)
+                    ? tick_rect.size.w : tick_rect.size.h;
+
+  // Tick thickness: background element, so moderately thin
+#if defined(PBL_ROUND)
+  int tick_thick = (h > 180) ? inner_short * 36 / 164
+                             : inner_short * 18 / 164;
+#else
+  int tick_thick = inner_short * 19 / 164;
+#endif
+
+  int radius = ((w > h) ? w : h) - RING_THICK - 1;
+
+  graphics_context_set_stroke_width(ctx, 0);
 
   // ----------------------------------------------------------
   // BACKGROUND
   // ----------------------------------------------------------
   graphics_context_set_fill_color(ctx, col_bg);
   graphics_fill_rect(ctx, bounds, 0, GCornerNone);
+
+  // ----------------------------------------------------------
+  // TICK MARKS (identical logic to Radium 2)
+  // ----------------------------------------------------------
+  if (!is_round) {
+    // RECT
+    int filled_groups = s_minute / 5;
+    int partial_min   = s_minute % 5;
+
+    // Minutes — empty
+    graphics_context_set_fill_color(ctx, col_dmin);
+    graphics_context_set_stroke_color(ctx, col_dmin);
+    for (int g = filled_groups + (partial_min > 0 ? 1 : 0); g < 12; g++) {
+      int a = 3 + 15*g;
+      draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 9));
+    }
+#if defined(PBL_COLOR)
+    graphics_context_set_fill_color(ctx, col_bg);
+    graphics_context_set_stroke_color(ctx, col_bg);
+    for (int g = filled_groups + (partial_min > 0 ? 1 : 0); g < 12; g++) {
+      int base = 3 + 15*g;
+      for (int i = 0; i < 4; i++) {
+        int gap = base + 2*i + 1;
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(gap), DEG_TO_TRIGANGLE(gap + 1));
+      }
+    }
+#endif
+
+    // Minutes — filled
+    graphics_context_set_fill_color(ctx, col_min);
+    graphics_context_set_stroke_color(ctx, col_min);
+    for (int g = 0; g < filled_groups; g++) {
+      int a = 3 + 15*g;
+      draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 9));
+    }
+#if defined(PBL_COLOR)
+    graphics_context_set_fill_color(ctx, col_bg);
+    graphics_context_set_stroke_color(ctx, col_bg);
+    for (int g = 0; g < filled_groups; g++) {
+      int base = 3 + 15*g;
+      for (int i = 0; i < 4; i++) {
+        int gap = base + 2*i + 1;
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(gap), DEG_TO_TRIGANGLE(gap + 1));
+      }
+    }
+#endif
+
+    // Minutes — partial group
+    if (partial_min > 0) {
+      int a = 3 + 15*filled_groups;
+      graphics_context_set_fill_color(ctx, col_dmin);
+      graphics_context_set_stroke_color(ctx, col_dmin);
+      draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 9));
+#if defined(PBL_COLOR)
+      graphics_context_set_fill_color(ctx, col_bg);
+      graphics_context_set_stroke_color(ctx, col_bg);
+      for (int i = 0; i < 4; i++) {
+        int gap = a + 2*i + 1;
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(gap), DEG_TO_TRIGANGLE(gap + 1));
+      }
+#endif
+      graphics_context_set_fill_color(ctx, col_min);
+      graphics_context_set_stroke_color(ctx, col_min);
+      for (int i = 0; i < partial_min; i++) {
+        int ta = a + 2*i;
+#if defined(PBL_BW)
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(ta), DEG_TO_TRIGANGLE(ta + 2));
+#else
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(ta), DEG_TO_TRIGANGLE(ta + 1));
+#endif
+      }
+    }
+
+    // Hours
+    bool is_24h = clock_is_24h_style();
+    int filled_slots = is_24h ? (s_hour / 2) : ((s_hour % 12) ?: 12);
+    int filled_half  = s_hour % 2;
+
+    graphics_context_set_fill_color(ctx, col_dhour);
+    graphics_context_set_stroke_color(ctx, col_dhour);
+    for (int h2 = 0; h2 < 12; h2++) {
+      int a = 183 + 15*h2;
+      draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 9));
+    }
+#if defined(PBL_COLOR)
+    graphics_context_set_fill_color(ctx, col_bg);
+    graphics_context_set_stroke_color(ctx, col_bg);
+    for (int h2 = 0; h2 < 12; h2++) {
+      int a = 183 + 15*h2;
+      draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a + 9), DEG_TO_TRIGANGLE(a + 10));
+    }
+    if (is_24h) {
+      for (int h2 = 0; h2 < 12; h2++) {
+        int a = 183 + 15*h2 + 3;
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 3));
+      }
+    }
+#endif
+
+    graphics_context_set_fill_color(ctx, col_hour);
+    graphics_context_set_stroke_color(ctx, col_hour);
+    if (!is_24h) {
+      for (int h2 = 0; h2 < filled_slots; h2++) {
+        int a = 183 + 15*h2;
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 9));
+      }
+    } else {
+      for (int h2 = 0; h2 < filled_slots; h2++) {
+        int a = 183 + 15*h2;
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a),     DEG_TO_TRIGANGLE(a + 3));
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a + 6), DEG_TO_TRIGANGLE(a + 9));
+      }
+      if (filled_slots < 12) {
+        int a = 183 + 15*filled_slots;
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 3));
+        if (filled_half == 1) {
+          draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a + 6), DEG_TO_TRIGANGLE(a + 9));
+        }
+      }
+    }
+#if defined(PBL_COLOR)
+    graphics_context_set_fill_color(ctx, col_bg);
+    graphics_context_set_stroke_color(ctx, col_bg);
+    for (int h2 = 0; h2 <= filled_slots && h2 < 12; h2++) {
+      int a = 183 + 15*h2;
+      draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a + 9), DEG_TO_TRIGANGLE(a + 10));
+    }
+    if (is_24h) {
+      for (int h2 = 0; h2 <= filled_slots && h2 < 12; h2++) {
+        int a = 183 + 15*h2 + 3;
+        draw_wedge(ctx, cx, cy, radius, DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 3));
+      }
+    }
+#endif
+
+  } else {
+    // ROUND
+    graphics_context_set_fill_color(ctx, col_dmin);
+    for (int i = 0; i < 60; i++) {
+      int a = 3 + 2*i + 5*(i/5);
+      graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                           DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 1));
+    }
+    graphics_context_set_fill_color(ctx, col_min);
+    for (int i = 0; i < s_minute; i++) {
+      int a = 3 + 2*i + 5*(i/5);
+      graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                           DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 1));
+    }
+    {
+      bool is_24h = clock_is_24h_style();
+      int filled_slots = is_24h ? (s_hour / 2) : ((s_hour % 12) ?: 12);
+      int filled_half  = s_hour % 2;
+
+      graphics_context_set_fill_color(ctx, col_dhour);
+      for (int h2 = 0; h2 < 12; h2++) {
+        int a = 183 + 15*h2;
+        graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                             DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 9));
+      }
+      if (is_24h) {
+        graphics_context_set_fill_color(ctx, col_bg);
+        for (int h2 = 0; h2 < 12; h2++) {
+          int a = 183 + 15*h2 + 3;
+          graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                               DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 3));
+        }
+      }
+      graphics_context_set_fill_color(ctx, col_hour);
+      if (!is_24h) {
+        for (int h2 = 0; h2 < filled_slots; h2++) {
+          int a = 183 + 15*h2;
+          graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                               DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 9));
+        }
+      } else {
+        for (int h2 = 0; h2 < filled_slots; h2++) {
+          int a = 183 + 15*h2;
+          graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                               DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 3));
+          graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                               DEG_TO_TRIGANGLE(a + 6), DEG_TO_TRIGANGLE(a + 9));
+        }
+        if (filled_slots < 12) {
+          int a = 183 + 15*filled_slots;
+          graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                               DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 3));
+          if (filled_half == 1) {
+            graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                                 DEG_TO_TRIGANGLE(a + 6), DEG_TO_TRIGANGLE(a + 9));
+          }
+        }
+        graphics_context_set_fill_color(ctx, col_bg);
+        for (int h2 = 0; h2 <= filled_slots && h2 < 12; h2++) {
+          int a = 183 + 15*h2 + 3;
+          graphics_fill_radial(ctx, tick_rect, GOvalScaleModeFitCircle, tick_thick,
+                               DEG_TO_TRIGANGLE(a), DEG_TO_TRIGANGLE(a + 3));
+        }
+      }
+    }
+  }
+
+  // ----------------------------------------------------------
+  // INNER GAP STRIP (rect only) — separates ticks from outer ring
+  // ----------------------------------------------------------
+#if !defined(PBL_ROUND)
+  if (show_ring) {
+    int strip = RING_THICK + RING_GAP;
+    graphics_context_set_fill_color(ctx, col_bg);
+    graphics_fill_rect(ctx, GRect(0,         0,         w,     strip), 0, GCornerNone);
+    graphics_fill_rect(ctx, GRect(0,         h - strip, w,     strip), 0, GCornerNone);
+    graphics_fill_rect(ctx, GRect(0,         0,         strip, h    ), 0, GCornerNone);
+    graphics_fill_rect(ctx, GRect(w - strip, 0,         strip, h    ), 0, GCornerNone);
+  }
+#endif
 
   // ----------------------------------------------------------
   // OUTER RING: battery (right) + steps (left)
@@ -235,12 +508,7 @@ static void draw_layer(Layer *layer, GContext *ctx) {
   }
 
   // ----------------------------------------------------------
-  // OVERLAY CIRCLE + CONTENT
-  // Round: digits only, no day/date.
-  // Rect:  digits in circle, day above, date below.
-  //
-  // TODO: replace placeholder text with monogram digit bitmaps
-  // once assets are designed (10 digits x 4 positions).
+  // OVERLAY CIRCLE
   // ----------------------------------------------------------
   int overlay_r = is_round
     ? ((w >= 260) ? 110 : (w >= 180) ? 76 : 58)
@@ -249,7 +517,10 @@ static void draw_layer(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, col_obg);
   graphics_fill_circle(ctx, GPoint(cx, cy), overlay_r);
 
-  // Placeholder: time digits as text (to be replaced by bitmap assets)
+  // ----------------------------------------------------------
+  // OVERLAY CONTENT
+  // Placeholder: LECO time text. TODO: replace with monogram digit bitmaps.
+  // ----------------------------------------------------------
   int time_h  = 40;
   int small_h = 18;
   int spacing = 3;
@@ -260,17 +531,15 @@ static void draw_layer(Layer *layer, GContext *ctx) {
     GRect(0, cy - time_h / 2 - 2, w, time_h + 4),
     GTextOverflowModeFill, GTextAlignmentCenter, NULL);
 
+  // Rect: day above circle, date below circle
 #if !defined(PBL_ROUND)
-  // Day above circle
-  int day_y = cy - overlay_r - small_h - spacing;
+  int day_y  = cy - overlay_r - small_h - spacing;
+  int date_y = cy + overlay_r + spacing;
   graphics_context_set_text_color(ctx, col_dfg);
   graphics_draw_text(ctx, s_day_buffer,
     fonts_get_system_font(FONT_KEY_GOTHIC_18),
     GRect(0, day_y, w, small_h + 2),
     GTextOverflowModeFill, GTextAlignmentCenter, NULL);
-
-  // Date below circle
-  int date_y = cy + overlay_r + spacing;
   graphics_draw_text(ctx, s_date_buffer,
     fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
     GRect(0, date_y, w, small_h + 2),
@@ -312,22 +581,35 @@ static void health_handler(HealthEventType event, void *context) {
 
 static void inbox_received(DictionaryIterator *iter, void *context) {
   Tuple *t;
+  // Text
   t = dict_find(iter, MESSAGE_KEY_TimeTextColor);
   if (t) s_settings.TimeTextColor   = GColorFromHEX(t->value->int32);
   t = dict_find(iter, MESSAGE_KEY_DateTextColor);
   if (t) s_settings.DateTextColor   = GColorFromHEX(t->value->int32);
+  // Lit
+  t = dict_find(iter, MESSAGE_KEY_LitHourColor);
+  if (t) s_settings.LitHourColor    = GColorFromHEX(t->value->int32);
+  t = dict_find(iter, MESSAGE_KEY_LitMinuteColor);
+  if (t) s_settings.LitMinuteColor  = GColorFromHEX(t->value->int32);
   t = dict_find(iter, MESSAGE_KEY_LitBatteryColor);
   if (t) s_settings.LitBatteryColor = GColorFromHEX(t->value->int32);
   t = dict_find(iter, MESSAGE_KEY_LitStepsColor);
   if (t) s_settings.LitStepsColor   = GColorFromHEX(t->value->int32);
+  // Unlit
+  t = dict_find(iter, MESSAGE_KEY_DimHourColor);
+  if (t) s_settings.DimHourColor    = GColorFromHEX(t->value->int32);
+  t = dict_find(iter, MESSAGE_KEY_DimMinuteColor);
+  if (t) s_settings.DimMinuteColor  = GColorFromHEX(t->value->int32);
   t = dict_find(iter, MESSAGE_KEY_DimBatteryColor);
   if (t) s_settings.DimBatteryColor = GColorFromHEX(t->value->int32);
   t = dict_find(iter, MESSAGE_KEY_DimStepsColor);
   if (t) s_settings.DimStepsColor   = GColorFromHEX(t->value->int32);
+  // Base
   t = dict_find(iter, MESSAGE_KEY_BackgroundColor);
   if (t) s_settings.BackgroundColor = GColorFromHEX(t->value->int32);
   t = dict_find(iter, MESSAGE_KEY_OverlayBgColor);
   if (t) s_settings.OverlayBgColor  = GColorFromHEX(t->value->int32);
+  // Non-color
   t = dict_find(iter, MESSAGE_KEY_StepGoal);
   if (t) s_settings.StepGoal        = (int)t->value->int32;
   t = dict_find(iter, MESSAGE_KEY_InvertBW);
@@ -346,9 +628,12 @@ static void window_load(Window *window) {
   s_canvas_layer = layer_create(layer_get_bounds(root));
   layer_set_update_proc(s_canvas_layer, draw_layer);
   layer_add_child(root, s_canvas_layer);
+  s_tri_path = gpath_create(&s_tri_info);
 }
 
 static void window_unload(Window *window) {
+  gpath_destroy(s_tri_path);
+  s_tri_path = NULL;
   layer_destroy(s_canvas_layer);
 }
 
@@ -372,7 +657,7 @@ static void init(void) {
   update_steps();
 #endif
   app_message_register_inbox_received(inbox_received);
-  app_message_open(256, 64);
+  app_message_open(512, 64);
 }
 
 static void deinit(void) {
