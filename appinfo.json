@@ -13,21 +13,21 @@
   ],
   "watchapp": { "watchface": true },
   "capabilities": ["configurable", "health"],
-  "appKeys": {
-    "TimeTextColor":    0,
-    "DateTextColor":    1,
-    "LitHourColor":     2,
-    "LitMinuteColor":   3,
-    "LitBatteryColor":  4,
-    "LitStepsColor":    5,
-    "DimHourColor":     6,
-    "DimMinuteColor":   7,
-    "DimBatteryColor":  8,
-    "DimStepsColor":    9,
-    "BackgroundColor":  10,
-    "OverlayBgColor":   11,
-    "StepGoal":         12,
-    "InvertBW":         13,
-    "ShowRing":         14
-  }
+  "messageKeys": [
+    "TimeTextColor",
+    "DateTextColor",
+    "LitHourColor",
+    "LitMinuteColor",
+    "LitBatteryColor",
+    "LitStepsColor",
+    "DimHourColor",
+    "DimMinuteColor",
+    "DimBatteryColor",
+    "DimStepsColor",
+    "BackgroundColor",
+    "OverlayBgColor",
+    "StepGoal",
+    "InvertBW",
+    "ShowRing"
+  ]
 }
