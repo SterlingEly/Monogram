@@ -208,7 +208,24 @@ Port any Radium 2 bug fixes to Monogram as appropriate.
 
 ---
 
-## 14. QUICK REFERENCE
+## 14. PLATFORM NOTES (CRITICAL)
+
+| Platform | Screen | Colors | Health | Notes |
+|----------|--------|--------|--------|-------|
+| aplite   | 144×168 rect | B&W | No | |
+| basalt   | 144×168 rect | 64 color | Yes | |
+| chalk    | 180×180 round | 64 color | Yes | Primary round target |
+| diorite  | 144×168 rect | B&W | Yes | |
+| emery    | 200×228 rect | 64 color | Yes | |
+| flint    | 144×168 rect | B&W | No | |
+| **gabbro** | **260×260 round** | **color** | **Yes** | Pebble Round 2 (Core Devices, 2026) |
+
+**B&W platforms:** aplite, diorite, flint only. Gabbro is color.
+`index.js` bwPlatforms list = `['aplite', 'diorite', 'flint']` — gabbro intentionally excluded.
+
+---
+
+## 15. QUICK REFERENCE
 
 ```
 Repo:         https://github.com/SterlingEly/Monogram
