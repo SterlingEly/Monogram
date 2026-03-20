@@ -29,15 +29,15 @@ Implementation by Sterling Ely & Claude (Anthropic). Skeleton derived from [Radi
 
 ## Platforms
 
-| Platform | Watch | Resolution |
-|----------|-------|------------|
-| Aplite   | Pebble Classic / Steel | 144×168 (B&W) |
-| Basalt   | Pebble Time / Steel | 144×168 (color) |
-| Chalk    | Pebble Time Round | 180×180 (color) |
-| Diorite  | Pebble 2 | 144×168 (B&W) |
-| Emery    | Pebble Time 2 | 200×228 (color) |
-| Flint    | Pebble 2 Duo | 144×168 (color) |
-| Gabbro   | Pebble Round 2 | 260×260 (color) |
+| Platform | Watch | Resolution | Colors |
+|----------|-------|------------|--------|
+| Aplite   | Pebble Classic / Steel | 144×168 | B&W |
+| Basalt   | Pebble Time / Steel | 144×168 | color |
+| Chalk    | Pebble Time Round | 180×180 | color |
+| Diorite  | Pebble 2 | 144×168 | B&W |
+| Emery    | Pebble Time 2 | 200×228 | color |
+| Flint    | Pebble 2 Duo | 144×168 | B&W |
+| **Gabbro** | **Pebble Round 2** | **260×260** | **color** |
 
 ---
 
