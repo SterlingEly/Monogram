@@ -1,5 +1,7 @@
 # Monogram
 
+> **Collaborators (human or AI):** read [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md) before making any code changes. It has current status, architecture, build rules, critical constants, and the active TODO list.
+
 A Pebble watchface built around custom monogram-style digit designs — tall vertical letterforms arranged within a circular boundary, inspired by traditional monogram aesthetics.
 
 ---
