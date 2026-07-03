@@ -217,6 +217,17 @@ typedef struct {
 
 ---
 
+## Related Projects
+
+Sibling Pebble watchface/tool repositories by Sterling Ely. This section is a pointer, not documentation — see each repo's own `PROJECT_CONTEXT.md` for details.
+
+- **Radium2** — https://github.com/SterlingEly/Radium2 — Monogram's direct architectural parent; shares its settings struct shape, tick ring, and outer ring drawing code.
+- **BarGraph2** — https://github.com/SterlingEly/BarGraph2 — Sibling watchface (rebuild of the original 2013 Bar Graph concept); no shared code with Monogram, same design/implementation team.
+- **PixelSampler** — https://github.com/SterlingEly/PixelSampler — Developer reference app for fonts, colors, and hardware capabilities across Pebble platforms; useful for verifying platform-specific rendering assumptions used here.
+- **TallBoy** — https://github.com/SterlingEly/TallBoy — Sibling watchface exploring large vector-drawn digits; relevant prior art for digit-rendering approaches, though its technique differs from Monogram's bitmap-asset plan.
+
+---
+
 ## Unresolved Questions
 
 - Final digit visual style (serif vs. sans-serif, weight, decorativeness) is undecided — pending Sterling's Photoshop designs.
@@ -228,6 +239,7 @@ typedef struct {
 
 ## Last Updated
 
-- This document consolidated from `CONTEXT_MONOGRAM.md` + `CONTEXT_SEED.md` by Claude (AI collaborator), March 2026.
-- Underlying facts (UUID, messageKeys, `main.c` SHA) cross-checked against live `appinfo.json` and repo tree at time of consolidation.
+- Consolidated from `CONTEXT_MONOGRAM.md` + `CONTEXT_SEED.md` by Claude (AI collaborator), March 2026.
+- Related Projects section added and structure re-aligned to the cross-repo project-context standard, July 2026.
+- Underlying facts (UUID, messageKeys, `main.c` SHA) cross-checked against live `appinfo.json` and repo tree at each revision.
 - **Maintainers:** update the Live-marked sections as status changes; Stable sections should only change when the underlying design/architecture actually changes.
