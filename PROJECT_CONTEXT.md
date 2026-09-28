@@ -16,7 +16,7 @@ Conceived alongside Radium 2 (2026) as a sibling watchface. Primary target is Pe
 ## Current Status
 *(Live)*
 
-- **NOT in the app store** (as of March 2026)
+- **NOT in the app store** (as of March 2026; re-verified 2026-09-28)
 - **UUID is a placeholder — must be replaced before any submission**
 - Scaffold builds and runs. Overlay currently shows a `LECO_36_BOLD_NUMBERS` system-font placeholder instead of custom digit bitmaps.
 - Infrastructure is functional: radial tick ring, outer battery/steps ring, overlay circle sizing.
