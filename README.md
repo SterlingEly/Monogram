@@ -1,8 +1,8 @@
 # Monogram
 
-> **SHELVED (2026-10-24).** Sterling's decision: [TallBoy](https://github.com/SterlingEly/TallBoy) on round watches delivers about 90% of what Monogram was meant to be, so TallBoy is the face that ships. This repo is kept, not deleted, as design history and a possible future branch point. See [Status](#status).
+> **DEFERRED (2026-10-24).** Sterling's decision: [TallBoy](https://github.com/SterlingEly/TallBoy) on round watches delivers about 90% of what Monogram was meant to be, so TallBoy is the face that ships. This repo is kept, not deleted, as design history and a possible future branch point. See [Status](#status).
 
-> **Collaborators (human or AI):** read [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md) before making any code changes. It has current status, architecture, build rules, critical constants, and the shelving rationale and revival path.
+> **Collaborators (human or AI):** read [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md) before making any code changes. It has current status, architecture, build rules, critical constants, and the deferral rationale and revival path.
 
 A Pebble watchface concept built around custom monogram-style digit designs — tall vertical letterforms arranged within a circular boundary, inspired by traditional monogram aesthetics.
 
@@ -10,13 +10,13 @@ A Pebble watchface concept built around custom monogram-style digit designs — 
 
 ## Status
 
-**Shelved (2026-10-24).** Not in any app store; no release is planned.
+**Deferred (2026-10-24).** Superseded in practice by TallBoy. Not in any app store; no release is planned.
 
 Why: TallBoy on round (Pebble Time Round, Pebble Round 2) already gets about 90% of the look Monogram was aiming for, without the 40 hand-drawn digit bitmaps this design needed.
 
 Revival path: if a future TallBoy technique can dynamically push every digit bound out to fit the circle even more tightly, in the way a true monogram does, Monogram would be **branched off TallBoy** rather than revived from this scaffold — unless the same fit can simply be added to TallBoy itself, in which case no separate face is needed.
 
-State at shelving: implementation scaffold only (derived from Radium 2). The overlay renders a `LECO_36_BOLD_NUMBERS` system-font placeholder. The 40 digit assets (10 digits × 4 positions) were never completed.
+State at deferral: implementation scaffold only (derived from Radium 2). The overlay renders a `LECO_36_BOLD_NUMBERS` system-font placeholder. The 40 digit assets (10 digits × 4 positions) were never completed.
 
 ---
 
