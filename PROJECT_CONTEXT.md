@@ -2,14 +2,14 @@
 
 > **Read this before making code changes.** This file is the primary AI/human handoff doc for this repo. Stable sections describe things that rarely change; Live sections describe current state and should be kept up to date as work progresses.
 
-> **SHELVED (2026-10-24).** Do not resume work on this repo unless Sterling asks. See "Shelving Decision" below.
+> **DEFERRED (2026-10-24).** Do not resume work on this repo unless Sterling asks. See "Deferral Decision" below.
 
 ---
 
-## Shelving Decision
+## Deferral Decision
 *(Live, decided 2026-10-24 by Sterling)*
 
-- **Decision:** Monogram is shelved indefinitely. The repo is kept (not deleted) as design history and a possible branch point.
+- **Decision:** Monogram is **deferred** indefinitely (superseded in practice by TallBoy, with a conditional revival path). The repo is kept (not deleted) as design history and a possible branch point. Status-term note: Sterling's own words were "shelved forever in its favor… unless I can someday dynamically push all bounds to fit the circle"; "deferred" was chosen on 2026-10-24 as the portfolio-wide term because the revival condition is real. Earlier docs said "shelved"; same meaning.
 - **Why:** [TallBoy](https://github.com/SterlingEly/TallBoy) on round watches delivers about 90% of what Monogram was meant to achieve (tall vector-drawn digits filling the circular face), without needing 40 hand-drawn digit bitmaps. Sterling's words: TallBoy on round is "about 90% of what I was trying to do with monogram".
 - **Revival path:** If TallBoy can someday dynamically push all digit bounds to fit the circle even more tightly, as a true monogram does, then either (a) add that fit to TallBoy itself, or (b) if Sterling does not want such changes in TallBoy, **branch a new Monogram off TallBoy** (not off this scaffold). The bitmap-asset plan below is superseded.
 - **Consequences:** no store listing, no UUID replacement, no asset design. The TODO list below is frozen.
@@ -28,12 +28,12 @@ Conceived alongside Radium 2 (2026) as a sibling watchface. Primary target is Pe
 ## Current Status
 *(Live)*
 
-- **SHELVED as of 2026-10-24** (see Shelving Decision above).
+- **DEFERRED as of 2026-10-24** (see Deferral Decision above).
 - **NOT in the app store** (as of March 2026; re-verified 2026-09-28)
 - **UUID is a placeholder** — it would have to be replaced before any submission.
 - Scaffold builds and runs. Overlay shows a `LECO_36_BOLD_NUMBERS` system-font placeholder instead of custom digit bitmaps.
 - Infrastructure is functional: radial tick ring, outer battery/steps ring, overlay circle sizing.
-- Was blocked on: 40 custom digit bitmap assets. Multiple AI/programmatic generation approaches were attempted and abandoned (see Known Traps). Sterling was designing these manually in Photoshop; that work stopped when the project was shelved.
+- Was blocked on: 40 custom digit bitmap assets. Multiple AI/programmatic generation approaches were attempted and abandoned (see Known Traps). Sterling was designing these manually in Photoshop; that work stopped when the project was deferred.
 
 ---
 
@@ -53,7 +53,7 @@ This split applies throughout unless a specific section of this repo says otherw
 SterlingEly/Monogram (main)
 ├── PROJECT_CONTEXT.md   ← this file
 ├── README.md
-├── STORE_LISTING.md     (stub; shelved, no listing will be written)
+├── STORE_LISTING.md     (stub; deferred, no listing will be written unless revived)
 ├── appinfo.json
 └── src/
     ├── main.c
@@ -119,7 +119,7 @@ graphics_draw_text(ctx, s_time_buffer,
   GTextOverflowModeFill, GTextAlignmentCenter, NULL);
 ```
 
-### Digit asset concept (design target, superseded by the shelving decision)
+### Digit asset concept (design target, superseded by the deferral decision)
 - **40 bitmap variants** = 4 digit positions (tens-of-hours, ones-of-hours, tens-of-minutes, ones-of-minutes) × 10 digits (0–9)
 - The two **outer** positions (tens-of-hours on the left, ones-of-minutes on the right) need their outer edge curved to match the circular screen boundary
 - The two **inner** positions are more standard straight-edged columns
@@ -127,12 +127,12 @@ graphics_draw_text(ctx, s_time_buffer,
 ### Implementation path for digit rendering (decision never made)
 - **Option A:** Continue in C, load bitmaps via `gbitmap_create_with_resource()`
 - **Option B (Sterling's stated preference):** Rebuild digit rendering in the JavaScript/Alloy SDK (Moddable XS engine, ES2025). Significant architectural shift from the current C implementation.
-- If revived, the preferred path is now to branch off TallBoy's vector-drawn digit approach instead (see Shelving Decision).
+- If revived, the preferred path is now to branch off TallBoy's vector-drawn digit approach instead (see Deferral Decision).
 
 ---
 
 ## Critical Constants / Message Keys
-*(Frozen at shelving — verify UUID/SHA against repo before trusting)*
+*(Frozen at deferral — verify UUID/SHA against repo before trusting)*
 
 - **UUID:** `a1b2c3d4-e5f6-7890-abcd-ef1234567890` ← **PLACEHOLDER, must replace before submission**
 - **Version:** 1.0 (versionCode 1)
@@ -184,7 +184,7 @@ typedef struct {
 ---
 
 ## Known Bugs / Known Traps
-*(Frozen at shelving)*
+*(Frozen at deferral)*
 
 - No functional bugs logged — the app never became feature-complete (digit rendering stayed a font placeholder).
 - Three prior approaches to generating the 40 digit assets were tried and abandoned:
@@ -196,20 +196,20 @@ typedef struct {
 ---
 
 ## Current TODO
-*(FROZEN — project shelved 2026-10-24; kept for history only)*
+*(FROZEN — project deferred 2026-10-24; kept for history only)*
 
 1. ~~Design 40 digit bitmap assets in Photoshop~~ — superseded by TallBoy
 2. ~~Decide digit-rendering implementation approach~~ — superseded; if revived, branch off TallBoy
 3. ~~Replace placeholder UUID~~ — only if revived
 4. ~~Add config page presets~~
-5. ~~Write store assets~~
+5. ~~Write store assets~~ — if revived, model the listing on the live Radium 2 repebble listing
 6. ~~Optimize round-screen digit layout~~ — TallBoy's round layouts cover this
 
 ---
 
 ## Verification Plan
 
-- Not applicable while shelved. If revived: build via [CloudPebble](https://cloudpebble.repebble.com) from the GitHub `main` branch, test in the emulator, and Sterling performs final on-device verification.
+- Not applicable while deferred. If revived: build via [CloudPebble](https://cloudpebble.repebble.com) from the GitHub `main` branch, test in the emulator, and Sterling performs final on-device verification.
 
 ---
 
@@ -220,9 +220,10 @@ typedef struct {
 - Sibling project / architecture source: https://github.com/SterlingEly/Radium2
 - CloudPebble: https://cloudpebble.repebble.com
 - Rebble Developer Portal: https://dev.rebble.io
-- Pebble Appstore listing: not listed (shelved)
-- Rebble Appstore listing: not listed (shelved)
+- Pebble Appstore listing: not listed (deferred)
+- Rebble Appstore listing: not listed (deferred)
 - CloudPebble / Round 2 / JS SDK announcement: https://repebble.com/blog/cloudpebble-returns-plus-pure-javascript-and-round-2-sdk
+- Pebble Plugins preview (announced 2026-10-23, future-only for any Sterling face): https://developer.repebble.com/guides/plugins/
 
 ---
 
@@ -230,7 +231,7 @@ typedef struct {
 
 Sibling Pebble watchface/tool repositories by Sterling Ely. This section is a pointer, not documentation — see each repo's own `PROJECT_CONTEXT.md` for details.
 
-- **TallBoy** — https://github.com/SterlingEly/TallBoy — Large vector-drawn digits. On round watches it delivers about 90% of Monogram's intent, which is why Monogram is shelved. The branch point if Monogram is ever revived.
+- **TallBoy** — https://github.com/SterlingEly/TallBoy — Large vector-drawn digits. On round watches it delivers about 90% of Monogram's intent, which is why Monogram is deferred. The branch point if Monogram is ever revived.
 - **Radium2** — https://github.com/SterlingEly/Radium2 — Monogram's architectural parent; shares its settings struct shape, tick ring, and outer ring drawing code.
 - **BarGraph2** — https://github.com/SterlingEly/BarGraph2 — Sibling watchface (rebuild of the original 2013 Bar Graph concept); no shared code with Monogram.
 - **PixelSampler** — https://github.com/SterlingEly/PixelSampler — Developer reference app for fonts, colors, and hardware capabilities across Pebble platforms.
@@ -240,7 +241,7 @@ Sibling Pebble watchface/tool repositories by Sterling Ely. This section is a po
 ## Unresolved Questions
 
 - Whether the `draw_text_stroked()` day/date stroke technique (mentioned in prior notes) is actually present in the currently committed `main.c` was never re-verified. Only matters if revived.
-- Everything else (digit style, implementation language, test suite) is moot while shelved.
+- Everything else (digit style, implementation language, test suite) is moot while deferred.
 
 ---
 
@@ -248,5 +249,6 @@ Sibling Pebble watchface/tool repositories by Sterling Ely. This section is a po
 
 - Consolidated from `CONTEXT_MONOGRAM.md` + `CONTEXT_SEED.md` by Claude (AI collaborator), March 2026.
 - Related Projects section added and structure re-aligned to the cross-repo project-context standard, July 2026.
-- 2026-10-24: Marked SHELVED at Sterling's direction (TallBoy on round covers ~90% of the intent); added Shelving Decision, froze TODO, README and STORE_LISTING updated to match.
+- 2026-10-24: Marked inactive at Sterling's direction (TallBoy on round covers ~90% of the intent); added the decision section, froze TODO, README and STORE_LISTING updated to match.
+- 2026-10-24 (later): status term standardized from "shelved" to **deferred** portfolio-wide at Sterling's request; Deferral Decision wording, links and Related Projects updated.
 - **Maintainers:** update the Live-marked sections as status changes; Stable sections should only change when the underlying design/architecture actually changes.
